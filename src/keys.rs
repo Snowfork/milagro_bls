@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 extern crate amcl;
 extern crate rand;
 extern crate zeroize;
@@ -7,11 +9,14 @@ use super::amcl_utils::{
     self, compress_g1, decompress_g1, g1mul, subgroup_check_g1, AmclError, Big, GroupG1,
     CURVE_ORDER, G1_BYTES, SECRET_KEY_BYTES,
 };
+use crate::BLSCurve;
 
-use amcl::hash256::HASH256;
-use rand::Rng;
 #[cfg(not(feature = "std"))]
 pub use alloc::vec::Vec;
+use amcl::hash256::HASH256;
+use codec::{Decode, Encode, MaxEncodedLen};
+use rand::Rng;
+use scale_info::TypeInfo;
 #[cfg(feature = "std")]
 use std::fmt;
 use BLSCurve::bls381::utils::{
@@ -77,7 +82,9 @@ impl SecretKey {
 
     /// Instantiate a SecretKey from existing bytes.
     pub fn from_bytes(input: &[u8]) -> Result<SecretKey, AmclError> {
-        Ok(Self { x: secret_key_from_bytes(input)? })
+        Ok(Self {
+            x: secret_key_from_bytes(input)?,
+        })
     }
 
     /// Export the SecretKey as 32 bytes.
@@ -112,7 +119,7 @@ impl Drop for SecretKey {
 }
 
 /// A BLS public key.
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen)]
 #[cfg_attr(feature = "std", derive(Debug))]
 pub struct PublicKey {
     pub point: GroupG1,
@@ -170,7 +177,9 @@ impl PublicKey {
         if bytes.len() != G1_BYTES * 2 {
             return Err(AmclError::InvalidG1Size);
         }
-        Ok(Self { point: deserialize_g1(bytes)? })
+        Ok(Self {
+            point: deserialize_g1(bytes)?,
+        })
     }
 
     /// KeyValidate
@@ -259,16 +268,28 @@ mod tests {
     #[test]
     fn test_public_key_uncompressed_serialization_incorrect_size() {
         let bytes = vec![1; 1];
-        assert_eq!(PublicKey::from_uncompressed_bytes(&bytes), Err(AmclError::InvalidG1Size));
+        assert_eq!(
+            PublicKey::from_uncompressed_bytes(&bytes),
+            Err(AmclError::InvalidG1Size)
+        );
 
         let bytes = vec![1; 95];
-        assert_eq!(PublicKey::from_uncompressed_bytes(&bytes), Err(AmclError::InvalidG1Size));
+        assert_eq!(
+            PublicKey::from_uncompressed_bytes(&bytes),
+            Err(AmclError::InvalidG1Size)
+        );
 
         let bytes = vec![1; 97];
-        assert_eq!(PublicKey::from_uncompressed_bytes(&bytes), Err(AmclError::InvalidG1Size));
+        assert_eq!(
+            PublicKey::from_uncompressed_bytes(&bytes),
+            Err(AmclError::InvalidG1Size)
+        );
 
         let bytes = vec![];
-        assert_eq!(PublicKey::from_uncompressed_bytes(&bytes), Err(AmclError::InvalidG1Size));
+        assert_eq!(
+            PublicKey::from_uncompressed_bytes(&bytes),
+            Err(AmclError::InvalidG1Size)
+        );
     }
 
     #[test]
@@ -277,22 +298,37 @@ mod tests {
         let mut bytes = vec![0; 96];
         bytes[47] = 1;
         bytes[95] = 1;
-        assert_eq!(PublicKey::from_uncompressed_bytes(&bytes), Err(AmclError::InvalidPoint));
+        assert_eq!(
+            PublicKey::from_uncompressed_bytes(&bytes),
+            Err(AmclError::InvalidPoint)
+        );
     }
 
     #[test]
     fn test_secret_key_from_bytes() {
         let bytes = vec![];
-        assert_eq!(SecretKey::from_bytes(&bytes), Err(AmclError::InvalidSecretKeySize));
+        assert_eq!(
+            SecretKey::from_bytes(&bytes),
+            Err(AmclError::InvalidSecretKeySize)
+        );
 
         let bytes = vec![1; 33];
-        assert_eq!(SecretKey::from_bytes(&bytes), Err(AmclError::InvalidSecretKeySize));
+        assert_eq!(
+            SecretKey::from_bytes(&bytes),
+            Err(AmclError::InvalidSecretKeySize)
+        );
 
         let bytes = vec![0; 32];
-        assert_eq!(SecretKey::from_bytes(&bytes), Err(AmclError::InvalidSecretKeyRange));
+        assert_eq!(
+            SecretKey::from_bytes(&bytes),
+            Err(AmclError::InvalidSecretKeyRange)
+        );
 
         let bytes = vec![255; 32];
-        assert_eq!(SecretKey::from_bytes(&bytes), Err(AmclError::InvalidSecretKeyRange));
+        assert_eq!(
+            SecretKey::from_bytes(&bytes),
+            Err(AmclError::InvalidSecretKeyRange)
+        );
     }
 
     #[test]
@@ -335,7 +371,10 @@ mod tests {
         let mut pk_bytes = vec![0; 48];
         pk_bytes[0] = 128;
 
-        assert_eq!(PublicKey::from_bytes(&pk_bytes), Err(AmclError::InvalidPoint));
+        assert_eq!(
+            PublicKey::from_bytes(&pk_bytes),
+            Err(AmclError::InvalidPoint)
+        );
         assert!(PublicKey::from_bytes_unchecked(&pk_bytes).is_ok());
     }
 
@@ -345,7 +384,10 @@ mod tests {
         let mut pk_bytes = vec![0; 48];
         pk_bytes[0] = 196;
 
-        assert_eq!(PublicKey::from_bytes(&pk_bytes), Err(AmclError::InvalidPoint));
+        assert_eq!(
+            PublicKey::from_bytes(&pk_bytes),
+            Err(AmclError::InvalidPoint)
+        );
     }
 
     #[test]

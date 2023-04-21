@@ -31,7 +31,9 @@ impl AggregatePublicKey {
             return Err(AmclError::AggregateEmptyPoints);
         }
 
-        let mut agg_key = Self { point: GroupG1::new() };
+        let mut agg_key = Self {
+            point: GroupG1::new(),
+        };
         for key in keys {
             agg_key.point.add(&key.point)
         }
@@ -59,7 +61,9 @@ impl AggregatePublicKey {
     ///
     /// Pre-requsites: Public key must be PoP verified before calling this function.
     pub fn from_public_key(key: &PublicKey) -> Self {
-        AggregatePublicKey { point: key.point.clone() }
+        AggregatePublicKey {
+            point: key.point.clone(),
+        }
     }
 
     /// Add a PublicKey to the AggregatePublicKey.
@@ -91,7 +95,9 @@ impl AggregateSignature {
     ///
     /// The underlying point will be set to infinity.
     pub fn new() -> Self {
-        Self { point: GroupG2::new() }
+        Self {
+            point: GroupG2::new(),
+        }
     }
 
     /// Instantiate a new AggregateSignature from a vector of Signatures.
@@ -107,7 +113,9 @@ impl AggregateSignature {
 
     /// Instantiate a new AggregateSignature from a single Signature.
     pub fn from_signature(signature: &Signature) -> Self {
-        AggregateSignature { point: signature.point.clone() }
+        AggregateSignature {
+            point: signature.point.clone(),
+        }
     }
 
     /// Add a Signature to the AggregateSignature.
@@ -433,7 +441,11 @@ mod tests {
             subset
         };
 
-        let messages = vec!["Small msg".as_bytes(), "cats lol".as_bytes(), &[42_u8; 133700]];
+        let messages = vec![
+            "Small msg".as_bytes(),
+            "cats lol".as_bytes(),
+            &[42_u8; 133700],
+        ];
 
         for message in messages {
             let mut agg_signature = AggregateSignature::new();
@@ -933,7 +945,9 @@ mod tests {
         let multiplier = Big::new_int(5);
         let mut point = GroupG1::generator();
         point = point.mul(&multiplier);
-        let public_key = PublicKey { point: point.clone() };
+        let public_key = PublicKey {
+            point: point.clone(),
+        };
         let aggregate_public_key = AggregatePublicKey::from_public_key(&public_key);
 
         assert_eq!(public_key.point, aggregate_public_key.point);
