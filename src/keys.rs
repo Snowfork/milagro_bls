@@ -119,8 +119,7 @@ impl Drop for SecretKey {
 }
 
 /// A BLS public key.
-#[derive(Clone, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen)]
-#[cfg_attr(feature = "std", derive(Debug))]
+#[derive(Debug, Clone, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen)]
 pub struct PublicKey {
     pub point: GroupG1,
 }
