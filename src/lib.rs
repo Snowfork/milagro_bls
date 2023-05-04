@@ -1,7 +1,4 @@
-#![cfg_attr(
-    not(feature = "std"),
-    no_std
-)]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(not(feature = "std"))]
 #[macro_use]
@@ -28,7 +25,7 @@ mod amcl_utils;
 mod keys;
 mod signature;
 
-use self::amcl::bls381 as BLSCurve;
+pub use self::amcl::bls381 as BLSCurve;
 
 pub use aggregates::{AggregatePublicKey, AggregateSignature};
 pub use amcl_utils::{AmclError, G1_BYTES, G2_BYTES, SECRET_KEY_BYTES};

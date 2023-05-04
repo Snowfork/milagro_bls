@@ -1,8 +1,11 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 extern crate amcl;
 #[cfg(feature = "std")]
 extern crate hex;
 extern crate rand;
 
+use crate::BLSCurve;
 use BLSCurve::bls381::proof_of_possession::DST_G2;
 use BLSCurve::ecp::ECP;
 use BLSCurve::ecp2::ECP2;
