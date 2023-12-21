@@ -17,6 +17,9 @@ use std::fmt;
 use BLSCurve::bls381::utils::{
     deserialize_g1, secret_key_from_bytes, secret_key_to_bytes, serialize_uncompressed_g1,
 };
+use crate::BLSCurve;
+use codec::{Decode, Encode, MaxEncodedLen};
+use scale_info::TypeInfo;
 
 // Key Generation Constants
 /// Domain for key generation.
@@ -112,8 +115,7 @@ impl Drop for SecretKey {
 }
 
 /// A BLS public key.
-#[derive(Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "std", derive(Debug))]
+#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen)]
 pub struct PublicKey {
     pub point: GroupG1,
 }
