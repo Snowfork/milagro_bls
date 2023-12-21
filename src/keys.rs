@@ -20,6 +20,7 @@ use BLSCurve::bls381::utils::{
 use crate::BLSCurve;
 use codec::{Decode, Encode, MaxEncodedLen};
 use scale_info::TypeInfo;
+use sp_core::RuntimeDebug;
 
 // Key Generation Constants
 /// Domain for key generation.
@@ -115,7 +116,7 @@ impl Drop for SecretKey {
 }
 
 /// A BLS public key.
-#[derive(Debug, Default, Copy, Clone, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen)]
+#[derive(Default, Copy, Clone, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen, RuntimeDebug)]
 pub struct PublicKey {
     pub point: GroupG1,
 }
