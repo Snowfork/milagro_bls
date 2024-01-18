@@ -19,6 +19,9 @@ use BLSCurve::bls381::utils::{
     deserialize_g1, secret_key_from_bytes, secret_key_to_bytes, serialize_uncompressed_g1,
 };
 
+use codec::{Decode, Encode, MaxEncodedLen};
+use scale_info::TypeInfo;
+
 // Key Generation Constants
 /// Domain for key generation.
 pub const KEY_SALT: &[u8] = b"BLS-SIG-KEYGEN-SALT-";
@@ -113,7 +116,7 @@ impl Drop for SecretKey {
 }
 
 /// A BLS public key.
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, Default, PartialEq, Eq, Encode, Decode, TypeInfo, MaxEncodedLen)]
 #[cfg_attr(feature = "std", derive(Debug))]
 pub struct PublicKey {
     pub point: GroupG1,
